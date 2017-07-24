@@ -14,24 +14,28 @@ pub trait NSStatusBar {
 
 impl NSStatusBar for id {
     unsafe fn statusItemWithLength(self, len: CGFloat) -> id {
-        msg_send![self, statusItemWithLength:len]
+        msg_send![self, statusItemWithLength: len]
     }
 }
 
 pub trait NSStatusItem {
     unsafe fn setHighlightMode_(self, mode: BOOL);
     unsafe fn setMenu_(self, menu: id);
+    unsafe fn button(self) -> id /* (NSStatusBarButton *) */;
     unsafe fn statusBar(self) -> id;
 }
 
 impl NSStatusItem for id {
     unsafe fn setHighlightMode_(self, mode: BOOL) {
-        msg_send![self, setHighlightMode:mode]
+        msg_send![self, setHighlightMode: mode]
     }
     unsafe fn statusBar(self) -> id {
         msg_send![self, statusBar]
     }
     unsafe fn setMenu_(self, menu: id) {
-        msg_send![self, setMenu:menu]
+        msg_send![self, setMenu: menu]
+    }
+    unsafe fn button(self) -> id /* (NSStatusBarButton *) */ {
+        msg_send![self, button]
     }
 }
