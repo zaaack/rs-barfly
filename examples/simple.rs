@@ -43,7 +43,7 @@ fn main() {
             );
         }),
     );
-
+    fly.set_title_at_index(0, "changed!");
     fly.add_quit_item("Quit");
 
     fly.display();

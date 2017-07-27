@@ -7,7 +7,7 @@ extern crate objc;
 pub use objc::Message;
 
 extern crate cocoa;
-pub use self::cocoa::base::{selector, nil, YES /* id, class, BOOL */};
+pub use self::cocoa::base::{selector, nil, YES, id /* class, BOOL */};
 pub use self::cocoa::appkit::{NSApp, NSApplication, NSWindow, NSMenu, NSMenuItem,
                               NSRunningApplication, NSImage, NSSquareStatusItemLength,
                               NSVariableStatusItemLength, NSApplicationActivateIgnoringOtherApps};
@@ -24,7 +24,7 @@ mod objc_ext;
 use self::objc_ext::{NSStatusBar, NSStatusItem};
 
 extern crate objc_foundation;
-pub use self::cocoa::foundation::{NSAutoreleasePool, NSString, NSData, NSSize};
+pub use self::cocoa::foundation::{NSAutoreleasePool, NSString, NSData, NSSize, NSInteger};
 pub use self::objc_foundation::{INSObject, NSObject};
 
 use std::fs::File;
@@ -39,6 +39,7 @@ pub enum Icon {
 
 pub struct OsxBarfly {
     icon: Icon,
+    app: id,
     menu: *mut objc::runtime::Object,
     pool: *mut objc::runtime::Object,
 }
@@ -48,6 +49,7 @@ impl Barfly for OsxBarfly {
         unsafe {
             OsxBarfly {
                 icon: Icon::Name(name.to_owned()),
+                app: NSApp(),
                 pool: NSAutoreleasePool::new(nil), /* TODO: not sure about the consequences of creating this here */
                 menu: NSMenu::new(nil).autorelease(),
             }
@@ -58,6 +60,7 @@ impl Barfly for OsxBarfly {
         unsafe {
             OsxBarfly {
                 icon: Icon::Image(buffer),
+                app: NSApp(),
                 pool: NSAutoreleasePool::new(nil), /* TODO: not sure about the consequences of creating this here */
                 menu: NSMenu::new(nil).autorelease(),
             }
@@ -90,6 +93,15 @@ impl Barfly for OsxBarfly {
         }
     }
 
+    fn set_title_at_index(&mut self, index: i32, title: &str) {
+        unsafe {
+            let item = NSMenu::itemAtIndex_(self.menu, index as NSInteger);
+            let astring = NSString::alloc(nil);
+            let itemtitle = NSString::init_str(astring, title);
+            msg_send![item, setTitle: itemtitle];
+        }
+    }
+
     // TODO: allow user callback
     fn add_quit_item(&mut self, label: &str) {
         unsafe {
@@ -106,9 +118,13 @@ impl Barfly for OsxBarfly {
         }
     }
 
+    fn quit(&mut self) {
+        unsafe { msg_send![self.app, terminate] };
+    }
+
     fn display(&mut self) {
         unsafe {
-            let app = NSApp();
+            let app = &mut self.app;
             app.activateIgnoringOtherApps_(YES);
 
             const ICON_WIDTH: f64 = 18.0;
