@@ -8,9 +8,11 @@ pub use objc::Message;
 
 pub trait Barfly {
     fn new(name: &str) -> Self;
-    fn from_image_buffer(buffer: Vec<u8>) -> Self;
-    fn from_image_file(path: &str) -> Self;
+    fn set_icon_from_text(&mut self, text: &str);
+    fn set_icon_from_buffer(&mut self, buffer: Vec<u8>);
+    fn set_icon_from_file(&mut self, path: &str);
     fn add_item(&mut self, menuItem: &str, cbs: Box<Fn() -> ()>);
+    fn add_menu_separator(&mut self);
     fn add_quit_item(&mut self, label: &str);
     fn set_title_at_index(&mut self, index: i32, title: &str);
     fn display(&mut self);
@@ -22,12 +24,6 @@ pub type PlatformFly = osx::OsxBarfly;
 
 pub fn new(name: &str) -> PlatformFly {
     PlatformFly::new(name)
-}
-pub fn from_image_buffer(buffer: Vec<u8>) -> PlatformFly {
-    PlatformFly::from_image_buffer(buffer)
-}
-pub fn from_image_file(path: &str) -> PlatformFly {
-    PlatformFly::from_image_file(path)
 }
 
 #[test]

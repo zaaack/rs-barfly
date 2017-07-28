@@ -8,7 +8,8 @@ extern crate barfly;
 use barfly::Barfly;
 
 fn main() {
-    let mut fly = barfly::from_image_file("/Users/z/Desktop/avatar.png");
+    let mut fly = barfly::new("");
+    fly.set_icon_from_file("/Users/z/Desktop/avatar.png");
 
     // make a hash map for the callbacks to mess with
     let hm: HashMap<String, String> = HashMap::new();

@@ -56,22 +56,18 @@ impl Barfly for OsxBarfly {
         }
     }
 
-    fn from_image_buffer(buffer: Vec<u8>) -> Self {
-        unsafe {
-            OsxBarfly {
-                icon: Icon::Image(buffer),
-                app: NSApp(),
-                pool: NSAutoreleasePool::new(nil), /* TODO: not sure about the consequences of creating this here */
-                menu: NSMenu::new(nil).autorelease(),
-            }
-        }
+    fn set_icon_from_text(&mut self, text: &str) {
+        self.icon = Icon::Name(text.to_owned());
+    }
+    fn set_icon_from_buffer(&mut self, buffer: Vec<u8>) {
+        self.icon = Icon::Image(buffer);
     }
 
-    fn from_image_file(file: &str) -> Self {
+    fn set_icon_from_file(&mut self, file: &str) {
         let mut file = File::open(file).unwrap();
         let mut buffer: Vec<u8> = vec![];
         file.read_to_end(&mut buffer).unwrap();
-        Self::from_image_buffer(buffer)
+        self.set_icon_from_buffer(buffer);
     }
 
     fn add_item(&mut self, menuItem: &str, cbs: Box<Fn() -> ()>) {
@@ -91,6 +87,10 @@ impl Barfly for OsxBarfly {
 
             NSMenu::addItem_(self.menu, item);
         }
+    }
+
+    fn add_menu_separator(&mut self) {
+        unimplemented!()
     }
 
     fn set_title_at_index(&mut self, index: i32, title: &str) {
