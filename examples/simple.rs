@@ -28,6 +28,8 @@ fn main() {
         }),
     );
 
+    fly.add_menu_separator();
+
     let fhm = hm.clone();
     fly.add_item(
         "Summon Herb",

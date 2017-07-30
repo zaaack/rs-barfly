@@ -90,7 +90,10 @@ impl Barfly for OsxBarfly {
     }
 
     fn add_menu_separator(&mut self) {
-        unimplemented!()
+        unsafe {
+            let item = NSMenuItem::separatorItem(nil);
+            NSMenu::addItem_(self.menu, item);
+        }
     }
 
     fn set_title_at_index(&mut self, index: i32, title: &str) {
