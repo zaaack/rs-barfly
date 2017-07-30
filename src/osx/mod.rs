@@ -70,7 +70,7 @@ impl Barfly for OsxBarfly {
         self.set_icon_from_buffer(buffer);
     }
 
-    fn add_item(&mut self, menuItem: &str, cbs: Box<Fn() -> ()>) {
+    fn add_item(&mut self, menuItem: &str, cbs: Box<FnMut() -> ()>) {
         unsafe {
             let cb_obj = Callback::from(cbs);
 
@@ -198,11 +198,11 @@ unsafe impl Message for Callback {}
 // another boxed object ($cbs_name), which, since it doesn't use traits, is actually a
 // regular "thin" pointer, and store THAT pointer in the ivar.  But...so...oy.
 struct CallbackState {
-    cb: Box<Fn() -> ()>,
+    cb: Box<FnMut() -> ()>,
 }
 
 impl Callback {
-    fn from(cb: Box<Fn() -> ()>) -> Id<Self> {
+    fn from(cb: Box<FnMut() -> ()>) -> Id<Self> {
         let cbs = CallbackState { cb: cb };
         let bcbs = Box::new(cbs);
 
@@ -243,7 +243,7 @@ impl INSObject for Callback {
                     let pval: u64 = *this.get_ivar("_cbptr");
                     let ptr = pval as *mut c_void;
                     let ptr = ptr as *mut CallbackState;
-                    let bcbs: Box<CallbackState> = Box::from_raw(ptr);
+                    let mut bcbs: Box<CallbackState> = Box::from_raw(ptr);
                     {
                         println!("cb test from cb");
                         (*bcbs.cb)();
